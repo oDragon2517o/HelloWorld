@@ -1,48 +1,23 @@
 pipeline {
-    agent { label 'windows' }
-
-    environment {
-        MSBUILD = '"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe"'
-    }
+    agent any
 
     stages {
-        stage('Checkout') {
+        stage('Install compiler') {
             steps {
-                git branch: 'master',
-                    url: 'https://github.com/oDragon2517o/HelloWorld.git'
+                sh 'which g++ || sudo apt update && sudo apt install -y g++'
             }
         }
 
-        stage('Build Debug x64') {
+        stage('Build') {
             steps {
-                bat """
-                %MSBUILD% HelloWorld\\HelloWorld.vcxproj ^
-                    /p:Configuration=Debug ^
-                    /p:Platform=x64 ^
-                    /m
-                """
+                sh 'g++ -std=c++20 HelloWorld/HelloWorld.cpp -o HelloWorldApp'
             }
         }
 
-        stage('Build Release x64') {
+        stage('Run') {
             steps {
-                bat """
-                %MSBUILD% HelloWorld\\HelloWorld.vcxproj ^
-                    /p:Configuration=Release ^
-                    /p:Platform=x64 ^
-                    /m
-                """
+                sh './HelloWorldApp'
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Build completed successfully'
-        }
-
-        failure {
-            echo 'Build failed'
         }
     }
 }
