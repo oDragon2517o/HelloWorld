@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     stages {
-        stage('Install compiler') {
+        stage('Check compiler') {
             steps {
-                sh 'which g++ || sudo apt update && sudo apt install -y g++'
+                sh 'g++ --version'
             }
         }
 
