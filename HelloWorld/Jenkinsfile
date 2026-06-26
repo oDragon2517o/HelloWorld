@@ -1,0 +1,48 @@
+pipeline {
+    agent { label 'windows' }
+
+    environment {
+        MSBUILD = '"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe"'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'master',
+                    url: 'https://github.com/oDragon2517o/HelloWorld.git'
+            }
+        }
+
+        stage('Build Debug x64') {
+            steps {
+                bat """
+                %MSBUILD% HelloWorld\\HelloWorld.vcxproj ^
+                    /p:Configuration=Debug ^
+                    /p:Platform=x64 ^
+                    /m
+                """
+            }
+        }
+
+        stage('Build Release x64') {
+            steps {
+                bat """
+                %MSBUILD% HelloWorld\\HelloWorld.vcxproj ^
+                    /p:Configuration=Release ^
+                    /p:Platform=x64 ^
+                    /m
+                """
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Build completed successfully'
+        }
+
+        failure {
+            echo 'Build failed'
+        }
+    }
+}
