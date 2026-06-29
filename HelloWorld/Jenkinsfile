@@ -18,6 +18,11 @@ pipeline {
             steps {
                 sh './HelloWorldApp'
             }
+            
+        stage('Archive') {
+            steps {
+                archiveArtifacts artifacts: 'HelloWorldApp', fingerprint: true
+            }
         }
     }
 }
