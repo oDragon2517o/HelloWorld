@@ -2,27 +2,32 @@ pipeline {
     agent any
 
     stages {
-        stage('Check compiler') {
-            steps {
-                sh 'g++ --version'
-            }
-        }
-
         stage('Build') {
             steps {
-                sh 'g++ -std=c++20 HelloWorld/HelloWorld.cpp -o HelloWorldApp'
-            }
-        }
+                script {
+                    def run
+                    def buildCmd
+                    def runCmd
+                    def artifact
 
-        stage('Run') {
-            steps {
-                sh './HelloWorldApp'
-            }
-        }
-            
-        stage('Archive') {
-            steps {
-                archiveArtifacts artifacts: 'HelloWorldApp', fingerprint: true
+                    if (isUnix()) {
+                        run = this.&sh
+                        buildCmd = 'g++ -std=c++20 HelloWorld/HelloWorld.cpp -o HelloWorldApp'
+                        runCmd = './HelloWorldApp'
+                        artifact = 'HelloWorldApp'
+                    } else {
+                        run = this.&bat
+                        buildCmd = 'g++ -std=c++20 HelloWorld\\HelloWorld.cpp -o HelloWorldApp.exe'
+                        runCmd = 'HelloWorldApp.exe'
+                        artifact = 'HelloWorldApp.exe'
+                    }
+
+                    run 'g++ --version'
+                    run buildCmd
+                    run runCmd
+
+                    archiveArtifacts artifacts: artifact, fingerprint: true
+                }
             }
         }
     }
